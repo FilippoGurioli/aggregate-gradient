@@ -7,6 +7,14 @@ import simple.gradient.jvmGetValue
 import simple.gradient.jvmSetSource
 import simple.gradient.jvmStep
 
+fun main() {
+    val engine = CollektiveEngine(10)
+
+    engine.setSource(0, true)
+
+    println("Connections of source (0): ${engine.getNeighborhood(0)}")
+}
+
 fun main2() {
     val engine = CollektiveEngine(10)
 
@@ -21,7 +29,7 @@ fun main2() {
     }
 }
 
-fun main() {
+fun main3() {
     val handle = jvmCreate(3, 3)
     jvmSetSource(handle, 0,true)
     for (r in 0 until 1)

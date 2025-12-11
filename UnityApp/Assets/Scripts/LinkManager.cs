@@ -21,6 +21,7 @@ public class LinksManager : MonoBehaviour
 
     private void Start()
     {
+        _engine = GetComponent<CollektiveEngine>();
         ClearLinks();
         foreach (var (a, b) in _engine.GetAllLinks())
         {

@@ -90,10 +90,7 @@ class NetworkManager(private val maxDegree: Int = 3) {
                 .filter { it.value != NoValue }
     }
 
-    fun getConnectionsOf(nodeId: Int): Set<Int> {
-        val neighborDeliverableMessages by lazy { messageBuffer[nodeId] ?: emptyMap() }
-        return neighborDeliverableMessages.keys
-    }
+    fun getConnectionsOf(nodeId: Int): Set<Int> = adjacency[nodeId]?.toSet() ?: emptySet()
 
     private object NoValue
 }

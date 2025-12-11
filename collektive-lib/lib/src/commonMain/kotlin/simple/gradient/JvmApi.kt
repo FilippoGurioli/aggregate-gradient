@@ -51,3 +51,5 @@ fun jvmGetValue(handle: Int, nodeId: Int): Int {
     val engine = engines[handle] ?: return Int.MAX_VALUE
     return engine.getValue(nodeId)
 }
+
+fun jvmGetNeighborhood(handle: Int, nodeId: Int): Set<Int>? = engines[handle]?.getNeighborhood(nodeId)

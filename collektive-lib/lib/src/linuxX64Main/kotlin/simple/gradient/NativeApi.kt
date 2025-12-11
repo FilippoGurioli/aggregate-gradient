@@ -71,3 +71,11 @@ fun getNeighborhood(
     }
     return array
 }
+
+@OptIn(ExperimentalNativeApi::class, ExperimentalForeignApi::class)
+@CName("free_neighborhood")
+fun freeNeighborhood(ptr: CPointer<IntVar>?) {
+    if (ptr != null) {
+        nativeHeap.free(ptr)
+    }
+}

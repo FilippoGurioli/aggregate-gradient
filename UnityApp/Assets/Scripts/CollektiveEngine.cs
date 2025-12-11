@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class CollektiveEngine : MonoBehaviour
@@ -52,10 +51,9 @@ public class CollektiveEngine : MonoBehaviour
     public List<(NodeBehaviour, NodeBehaviour)> GetAllLinks()
     {
         var result = new List<(NodeBehaviour, NodeBehaviour)>();
-
-        foreach (var (_, node) in _nodes)
+        foreach (var (id, node) in _nodes)
         {
-            var neighborhood = CollektiveNativeApi.GetNeighborhood(node.Id);
+            var neighborhood = CollektiveNativeApi.GetNeighborhood(_handle, node.Id);
             foreach (var neighborId in neighborhood)
             {
                 if (!_nodes.TryGetValue(neighborId, out var neighborNode))
@@ -65,7 +63,6 @@ public class CollektiveEngine : MonoBehaviour
                 result.Add((node, neighborNode));
             }
         }
-
         return result;
     }
 }

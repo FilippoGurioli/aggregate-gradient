@@ -14,12 +14,12 @@ namespace Editor
         private const string KotlinProjectPath = "../collektive-lib";
         private const string GradleExecutable = "../collektive-lib/gradlew";
         private const string GradleTask = "linkReleaseSharedLinuxX64";
-    
+
         private const string SourceSoPath =
-            "../collektive-lib/lib/build/bin/native/releaseShared/libsimple_gradient.so";
-    
+            "../collektive-lib/lib/build/bin/linuxX64/releaseShared/libsimple_gradient.so";
+
         private const string UnitySoPath = "Assets/Plugins/Linux/libsimple_gradient.so";
-    
+
         [MenuItem("Tools/Native/Rebuild libsimple_gradient")]
         public static void RebuildNativeLibrary()
         {
@@ -39,7 +39,7 @@ namespace Editor
                 Debug.LogError($"NativeLibBuilder: Exception while rebuilding native library: {ex}");
             }
         }
-    
+
         private static bool RunGradleBuild()
         {
             var workingDir = Path.GetFullPath(KotlinProjectPath);
@@ -79,7 +79,7 @@ namespace Editor
             Debug.Log($"NativeLibBuilder: Gradle build finished with exit code {process.ExitCode} (success = {success})");
             return success;
         }
-    
+
         private static void CopySoIntoUnity()
         {
             var source = Path.GetFullPath(SourceSoPath);
@@ -93,7 +93,7 @@ namespace Editor
             Debug.Log($"NativeLibBuilder: Copied .so from '{source}' to '{destination}'");
             AssetDatabase.Refresh();
         }
-    
+
         private static void ConfigurePluginImporter()
         {
             var importer = AssetImporter.GetAtPath(UnitySoPath) as PluginImporter;
