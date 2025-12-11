@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3822810292f4720b49421840948cb71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CollektiveEngine
-  nodeCount: 100
+  nodeCount: 94
   maxDegree: 3
   sources: 00000000
   timeScale: 0.01
@@ -270,8 +270,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0056806556, y: 0.0037392552, z: 0.000019520936, w: 0.99997693}
-  m_LocalPosition: {x: 1.1725233, y: 15.397872, z: -38.778343}
+  m_LocalRotation: {x: 0.19259153, y: 0.008091051, z: -0.0015902075, w: 0.98124444}
+  m_LocalPosition: {x: 0.78350806, y: 3.520894, z: -50.92592}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
