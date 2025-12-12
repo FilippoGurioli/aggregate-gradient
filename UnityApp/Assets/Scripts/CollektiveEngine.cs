@@ -4,12 +4,13 @@ using UnityEngine;
 public class CollektiveEngine : MonoBehaviour
 {
     [SerializeField] private int nodeCount = 10;
-    [SerializeField] private int maxDegree = 3;
+    [SerializeField] private double maxDistance = 3f;
     [SerializeField] private List<int> sources = new List<int> { 0 };
     [SerializeField] private float timeScale = 0.1f;
     [SerializeField] private int rounds = 10;
     [SerializeField] private NodeBehaviour nodePrefab;
     [SerializeField] private float distance = 3f;
+    [SerializeField] private bool noStop;
 
     private int _handle;
     private int _currentRound;
@@ -17,18 +18,20 @@ public class CollektiveEngine : MonoBehaviour
 
     private void Awake()
     {
-        _handle = CollektiveNativeApi.Create(nodeCount, maxDegree);
+        _handle = CollektiveApiWithDistance.Create(nodeCount, maxDistance);
         foreach (var source in sources)
-            CollektiveNativeApi.SetSource(_handle, source, true);
+            CollektiveApiWithDistance.SetSource(_handle, source, true);
         Time.timeScale = timeScale;
         CreateNodeTree();
     }
 
     private void FixedUpdate() //internal simulation loop -> currently bound to unity | to be uncorrelated
     {
-        if (_currentRound >= rounds) return;
+        if (!noStop && _currentRound >= rounds) return;
         _currentRound++;
-        CollektiveNativeApi.Step(_handle, 1);
+        foreach (var (_, node) in _nodes)
+            CollektiveApiWithDistance.UpdatePosition(_handle, node.Id, node.transform.position);
+        CollektiveApiWithDistance.Step(_handle, 1);
     }
 
     private void CreateNodeTree()
@@ -87,7 +90,7 @@ public class CollektiveEngine : MonoBehaviour
             var currentDepth = depth[current];
 
             // Get neighbors from the native engine
-            var neighbors = CollektiveNativeApi.GetNeighborhood(handle, current);
+            var neighbors = CollektiveApiWithDistance.GetNeighborhood(handle, current);
             if (neighbors == null) continue;
 
             foreach (var neighbor in neighbors)
@@ -154,14 +157,14 @@ public class CollektiveEngine : MonoBehaviour
         return positions;
     }
 
-    public int GetValue(int id) => CollektiveNativeApi.GetValue(_handle, id);
+    public int GetValue(int id) => CollektiveApiWithDistance.GetValue(_handle, id);
 
     public List<(NodeBehaviour, NodeBehaviour)> GetAllLinks()
     {
         var result = new List<(NodeBehaviour, NodeBehaviour)>();
         foreach (var (id, node) in _nodes)
         {
-            var neighborhood = CollektiveNativeApi.GetNeighborhood(_handle, node.Id);
+            var neighborhood = CollektiveApiWithDistance.GetNeighborhood(_handle, node.Id);
             foreach (var neighborId in neighborhood)
             {
                 if (!_nodes.TryGetValue(neighborId, out var neighborNode))

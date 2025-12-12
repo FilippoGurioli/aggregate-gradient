@@ -164,14 +164,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3822810292f4720b49421840948cb71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CollektiveEngine
-  nodeCount: 94
-  maxDegree: 3
+  nodeCount: 10
+  maxDistance: 3
   sources: 00000000
   timeScale: 0.05
   rounds: 10
   nodePrefab: {fileID: 2148512758480813076, guid: 8222f78618b9ac314ab51a649986c1a6, type: 3}
   distance: 1.5
-  infiniteRounds: 1
+  noStop: 1
 --- !u!114 &117283547
 MonoBehaviour:
   m_ObjectHideFlags: 0

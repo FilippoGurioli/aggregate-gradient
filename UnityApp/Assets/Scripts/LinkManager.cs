@@ -30,4 +30,8 @@ public class LinksManager : MonoBehaviour
             _links.Add(linkInstance);
         }
     }
+
+    private void Update()
+    {
+    }
 }
