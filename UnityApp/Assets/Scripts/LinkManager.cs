@@ -7,31 +7,46 @@ public class LinksManager : MonoBehaviour
     [SerializeField] private LinkBehaviour linkPrefab;
 
     private CollektiveEngine _engine;
-    private readonly List<LinkBehaviour> _links = new();
-
-    private void ClearLinks()
-    {
-        foreach (var link in _links)
-        {
-            if (link != null)
-                Destroy(link.gameObject);
-        }
-        _links.Clear();
-    }
+    private readonly Dictionary<(int a, int b), LinkBehaviour> _linksByKey = new();
 
     private void Start()
     {
         _engine = GetComponent<CollektiveEngine>();
-        ClearLinks();
-        foreach (var (a, b) in _engine.GetAllLinks())
+        RebuildLinks();
+    }
+
+    private void Update() => UpdateLinks();
+
+    private void UpdateLinks()
+    {
+        var toRemove = new List<(int, int)>(_linksByKey.Keys);
+        foreach (var (aNode, bNode) in _engine.GetAllLinks())
         {
-            var linkInstance = Instantiate(linkPrefab);
-            linkInstance.Initialize(a, b);
-            _links.Add(linkInstance);
+            var key = MakeKey(aNode.Id, bNode.Id);
+            toRemove.Remove(key);
+            if (!_linksByKey.TryGetValue(key, out var link) || link == null)
+            {
+                var linkInstance = Instantiate(linkPrefab);
+                linkInstance.Initialize(aNode, bNode);
+                _linksByKey[key] = linkInstance;
+            }
+        }
+
+        foreach (var key in toRemove)
+        {
+            if (_linksByKey.TryGetValue(key, out var link) && link != null)
+                Destroy(link.gameObject);
+            _linksByKey.Remove(key);
         }
     }
 
-    private void Update()
+    private void RebuildLinks()
     {
+        foreach (var kv in _linksByKey)
+            if (kv.Value != null) Destroy(kv.Value.gameObject);
+        _linksByKey.Clear();
+        UpdateLinks();
     }
+
+    private static (int a, int b) MakeKey(int id1, int id2) => id1 < id2 ? (id1, id2) : (id2, id1);
 }

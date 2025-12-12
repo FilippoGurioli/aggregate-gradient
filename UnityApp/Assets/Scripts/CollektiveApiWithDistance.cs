@@ -24,7 +24,7 @@ internal static class CollektiveApiWithDistance
     public static extern void Step(int handle, int rounds);
 
     [DllImport(LibName, EntryPoint = "get_value_with_distance", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int GetValue(int handle, int nodeId);
+    public static extern double GetValue(int handle, int nodeId);
 
     [DllImport(LibName, EntryPoint = "get_neighborhood_with_distance", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr GetNeighborhoodNative(int handle, int nodeId, out int size);

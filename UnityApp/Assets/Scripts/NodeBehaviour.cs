@@ -7,6 +7,7 @@ public class NodeBehaviour : MonoBehaviour
     private Renderer _renderer;
     private readonly Color _minColor = Color.white;
     private readonly Color _maxColor = Color.black;
+    [SerializeField] private double currentValue;
 
     public int Id { get; private set; }
 
@@ -19,9 +20,10 @@ public class NodeBehaviour : MonoBehaviour
 
     private void Update() => DisplayGradient(_engine.GetValue(Id));
 
-    private void DisplayGradient(int value)
+    private void DisplayGradient(double value)
     {
-        var t = Mathf.InverseLerp(0f, 6, value);
+        currentValue = value;
+        var t = Mathf.InverseLerp(0f, 30f, (float)value);
         var color = Color.Lerp(_minColor, _maxColor, t);
         _renderer.material.color = color;
     }

@@ -37,7 +37,7 @@ public class CollektiveEngine : MonoBehaviour
     private void CreateNodeTree()
     {
         // 1. Compute positions using a BFS-tree layout rooted at node 0
-        var positions = ComputeTreeLayout(_handle, nodeCount, distance, distance * 3);
+        var positions = ComputeTreeLayout(_handle, nodeCount, distance, distance * 2);
 
         // 2. Instantiate nodes using the computed positions
         for (var i = 0; i < nodeCount; i++)
@@ -157,7 +157,7 @@ public class CollektiveEngine : MonoBehaviour
         return positions;
     }
 
-    public int GetValue(int id) => CollektiveApiWithDistance.GetValue(_handle, id);
+    public double GetValue(int id) => CollektiveApiWithDistance.GetValue(_handle, id);
 
     public List<(NodeBehaviour, NodeBehaviour)> GetAllLinks()
     {
