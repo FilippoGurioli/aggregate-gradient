@@ -14,6 +14,7 @@ public class LinkBehaviour : MonoBehaviour
         _a = a;
         _b = b;
         _line = GetComponent<LineRenderer>();
+        name = $"link {_a.Id} <-> {_b.Id}";
         UpdatePositions();
     }
 

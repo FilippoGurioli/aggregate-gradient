@@ -77,7 +77,10 @@ public class RuntimeTranslateTool : MonoBehaviour
     {
         var ray = ScreenRay();
         if (Physics.Raycast(ray, out var hit, rayDistance, selectableMask, QueryTriggerInteraction.Ignore))
+        {
             _selected = hit.transform;
+            Debug.Log($"[{name}] selected {_selected.name}", this);
+        }
         else
             _selected = null;
     }

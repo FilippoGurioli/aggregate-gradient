@@ -14,6 +14,7 @@ public class NodeBehaviour : MonoBehaviour
         Id = id;
         _engine = engine;
         _renderer = GetComponent<Renderer>();
+        name = $"node {Id}";
     }
 
     private void Update() => DisplayGradient(_engine.GetValue(Id));
