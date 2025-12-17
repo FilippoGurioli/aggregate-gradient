@@ -5,3 +5,4 @@ plugins {
 rootProject.name = "collektive-lib"
 include("lib")
 include("app")
+include("socket-server")

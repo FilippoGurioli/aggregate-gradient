@@ -65,9 +65,7 @@ fun getNeighborhoodWithDistance(
     }
 
     val neighbors: List<Int> =
-        engine.getNeighborhood(Node(nodeId, Position.origin()))
-            .map { it.id }
-            .sorted()
+        engine.getNeighborhood(nodeId).toList()
 
     outSize.pointed.value = neighbors.size
     if (neighbors.isEmpty()) return null

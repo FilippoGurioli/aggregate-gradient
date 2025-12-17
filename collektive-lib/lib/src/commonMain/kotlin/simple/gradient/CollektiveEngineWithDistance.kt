@@ -3,7 +3,7 @@ package simple.gradient
 import it.unibo.collektive.Collektive
 import kotlin.Double.Companion.POSITIVE_INFINITY
 
-class CollektiveEngineWithDistance(nodeCount: Int, private val maxDistance: Double) {
+class CollektiveEngineWithDistance(nodeCount: Int, maxDistance: Double) {
     private val networkManager = NetworkManagerWithDistance(maxDistance)
     val sources = mutableSetOf<Int>()
 
@@ -53,5 +53,7 @@ class CollektiveEngineWithDistance(nodeCount: Int, private val maxDistance: Doub
 
     fun getValue(nodeId: Int): Double = lastValues[nodeId]
 
-    fun getNeighborhood(node: Node): Set<Node> = networkManager.getNeighbors(node)
+    fun getValues(): List<Double> = lastValues.toList()
+
+    fun getNeighborhood(nodeId: Int): Set<Int> = networkManager.getNeighbors(nodeId)
 }

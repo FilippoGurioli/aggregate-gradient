@@ -81,9 +81,8 @@ class NetworkManagerWithDistance(var maxDistance: Double) {
         adjacencyById = next.mapValues { it.value.toSet() }
     }
 
-    fun getNeighbors(node: Node): Set<Node> {
-        val neighborIds = adjacencyById[node.id].orEmpty()
-        return neighborIds.mapNotNull { id -> nodesById[id]?.toNode() }.toSet()
+    fun getNeighbors(nodeId: Int): Set<Int> {
+        return adjacencyById[nodeId].orEmpty()
     }
 
     /**
