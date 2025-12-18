@@ -60,8 +60,13 @@ public class CollektiveEngineSocket : MonoBehaviour, IEngine, IEngineWithLinks
 
     private void FixedUpdate()
     {
-        if (!noStop && _currentRound >= rounds) return;
-        _currentRound++;
+        if (!noStop)
+        {
+            Debug.Log($"{_currentRound}/{rounds}");
+            _currentRound++;
+            if (_currentRound >= rounds)
+                Application.Quit();
+        }
         foreach (var (_, node) in _nodes)
             _engine.NewPosition(node.Id, node.transform.position);
         _engine.Step();

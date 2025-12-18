@@ -21,6 +21,9 @@ import org.example.message.State
 import org.example.message.Step
 import simple.gradient.CollektiveEngineWithDistance
 import simple.gradient.Position
+import time.CsvFileSink
+import time.TimeMeasurer
+import java.io.File
 import java.text.ParseException
 
 val json = Json {
@@ -29,9 +32,15 @@ val json = Json {
     allowSpecialFloatingPointValues = true
 }
 
+val sink = CsvFileSink(File("socket.csv"))
+val tm: TimeMeasurer = TimeMeasurer(sink)
+
 private val engines = mutableMapOf<String, CollektiveEngineWithDistance>()
 
 fun main(args: Array<String>) {
+    Runtime.getRuntime().addShutdownHook(Thread {
+        sink.close()
+    })
     val host = "127.0.0.1"
     val port = (args.firstOrNull()?.toIntOrNull()) ?: 9090
     val pool = Executors.newCachedThreadPool()
@@ -84,12 +93,19 @@ object App {
                 engines[remote]?.setSource(req.nodeId, true)
             }
             "step" -> {
+                tm.start("step.service")
                 val req = json.decodeFromJsonElement<Step>(data)
-                engines[remote]?.stepMany(req.stepCount)
                 val engine = engines[remote] ?: return
+
+                tm.start("step.compute")
+                engine.stepMany(req.stepCount)
+                tm.stop("step.compute")
+
                 send(writer, State(
                     engine.getValues().mapIndexed { index, value -> NodeState(value, engine.getNeighborhood(index))}.toList()
                 ))
+
+                tm.stop("step.service")
             }
             "newPosition" -> {
                 val req = json.decodeFromJsonElement<NewPosition>(data)
