@@ -3,6 +3,9 @@ using System.Linq;
 using Data;
 using Engine;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class CollektiveEngineSocket : MonoBehaviour, IEngine, IEngineWithLinks
 {
@@ -25,10 +28,16 @@ public class CollektiveEngineSocket : MonoBehaviour, IEngine, IEngineWithLinks
     private SocketEngine _engine;
     private Dictionary<int, double> _state = new();
     private HashSet<Link> _links = new();
+    private UnityCsvTiming _timings;
+    private int _rid;
+    private long _stepStart;
 
     private void Awake()
     {
+        _timings = new UnityCsvTiming("unity_socket.csv");
         _engine = new SocketEngine(host, port);
+        _engine.NowTicks = _timings.NowTicks;
+        _engine.WriteTimings = (id, a, b) => _timings.Write(id, a, b);
         _engine.Create(nodeCount, maxDistance);
         foreach (var source in sources)
         {
@@ -47,6 +56,7 @@ public class CollektiveEngineSocket : MonoBehaviour, IEngine, IEngineWithLinks
 
     private void UpdateState(List<(double value, List<int> neighbors)> state)
     {
+        var tApply0 = _timings.NowTicks();
         for (int i = 0; i < state.Count; i++)
             _state[i] = state[i].value;
         var newLinks = new HashSet<Link>();
@@ -56,6 +66,13 @@ public class CollektiveEngineSocket : MonoBehaviour, IEngine, IEngineWithLinks
         _links.RemoveWhere(link => !newLinks.Contains(link));
         foreach (var link in newLinks)
             _links.Add(link);
+        var tApply1 = _timings.NowTicks();
+        _timings.Write("step.unity.apply", tApply0, tApply1);
+        if (_stepStart != 0)
+        {
+            _timings.Write("step.unity.e2e", _stepStart, tApply1);
+            _stepStart = 0;
+        }
     }
 
     private void FixedUpdate()
@@ -65,15 +82,31 @@ public class CollektiveEngineSocket : MonoBehaviour, IEngine, IEngineWithLinks
             Debug.Log($"{_currentRound}/{rounds}");
             _currentRound++;
             if (_currentRound >= rounds)
+            {
+#if UNITY_EDITOR
+                EditorApplication.isPlaying = false;
+#else
                 Application.Quit();
+#endif
+            }
         }
         foreach (var (_, node) in _nodes)
             _engine.NewPosition(node.Id, node.transform.position);
-        _engine.Step();
+        _engine.Poll();
+        if (_stepStart == 0)
+        {
+            _rid++;
+            _stepStart = _timings.NowTicks();
+            _engine.Step(_rid, _stepStart, 1);
+        }
         _engine.Poll();
     }
 
-    private void OnDestroy() => _engine.Dispose();
+    private void OnDestroy()
+    {
+        _timings?.Dispose();
+        _engine.Dispose();
+    }
 
     private void CreateNodeTree()
     {

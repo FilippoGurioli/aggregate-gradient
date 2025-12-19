@@ -33,6 +33,9 @@ namespace Engine
 
         public event Action<List<(double value, List<int> neighbors)>> OnNewState;
         public event Action<string> OnProtocolError;
+        public Func<long> NowTicks;
+        public Action<string, long, long> WriteTimings;
+        private readonly ConcurrentDictionary<int, long> _pendingSteps = new();
 
         public SocketEngine(string host, int port) => Connect(host, port);
 
@@ -42,8 +45,11 @@ namespace Engine
         public void SetSource(int nodeId)
             => SendOp("setSource", new { nodeId });
 
-        public void Step(int stepCount = 1)
-            => SendOp("step", new { stepCount });
+        public void Step(int rid, long startTicks, int stepCount = 1)
+        {
+            _pendingSteps[rid] = startTicks;
+            SendOp("step", new { stepCount, rid });
+        }
 
         public void NewPosition(int nodeId, Vector3 position)
             => SendOp("newPosition", new { nodeId, x = position.x, y = position.y, z = position.z });
@@ -61,25 +67,42 @@ namespace Engine
 
         private void HandleInboundLine(string line)
         {
-            // Debug.Log($"[Unity] <- {line}");
+            bool doTiming = (NowTicks != null && WriteTimings != null);
+            long tParse0 = 0;
+            if (doTiming) tParse0 = NowTicks.Invoke();
 
             JObject obj;
-            try
-            {
-                obj = JObject.Parse(line);
-            }
+            try { obj = JObject.Parse(line); }
             catch (Exception ex)
             {
                 OnProtocolError?.Invoke($"Invalid JSON from server: {ex.Message}. Line: {line}");
                 return;
             }
+
             var valuesToken = obj["values"];
             if (valuesToken != null && valuesToken.Type == JTokenType.Array)
             {
                 try
                 {
                     var state = valuesToken.ToObject<List<NodeStateDto>>();
-                    OnNewState?.Invoke(state.Select(nodeState => (nodeState.Value, nodeState.Neighbors)).ToList());
+                    var parsedState = state.Select(ns => (ns.Value, ns.Neighbors)).ToList();
+                    int rid = obj["rid"]?.Value<int>() ?? -1;
+
+                    if (doTiming)
+                    {
+                        long tParse1 = NowTicks.Invoke();
+                        WriteTimings.Invoke("step.socket.parse", tParse0, tParse1);
+
+                        if (rid != -1 && _pendingSteps.TryRemove(rid, out var startTicks))
+                            WriteTimings.Invoke("step.socket.wait", startTicks, tParse1);
+                    }
+                    else
+                    {
+                        // still remove pending step to avoid growth
+                        if (rid != -1) _pendingSteps.TryRemove(rid, out _);
+                    }
+
+                    OnNewState?.Invoke(parsedState);
                 }
                 catch (Exception ex)
                 {
@@ -87,11 +110,13 @@ namespace Engine
                 }
                 return;
             }
+
             if (obj["error"] != null)
             {
                 OnProtocolError?.Invoke(obj["error"]!.ToString());
                 return;
             }
+
             OnProtocolError?.Invoke($"Unknown message from server: {line}");
         }
 
@@ -147,12 +172,22 @@ namespace Engine
                 ["data"] = data != null ? JToken.FromObject(data) : new JObject()
             };
             var line = payload.ToString(Formatting.None);
+
+            bool doTiming = (NowTicks != null && WriteTimings != null);
+            long t0 = 0;
+            if (doTiming && op == "step") t0 = NowTicks.Invoke();
+
             lock (_txLock)
             {
                 if (_writer == null) return;
                 _writer.WriteLine(line);
             }
-            // Debug.Log($"[Unity] -> {line}");
+
+            if (doTiming && op == "step")
+            {
+                long t1 = NowTicks.Invoke();
+                WriteTimings.Invoke("step.socket.send", t0, t1);
+            }
         }
     }
 }

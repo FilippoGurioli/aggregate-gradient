@@ -102,6 +102,7 @@ object App {
                 tm.stop("step.compute")
 
                 send(writer, State(
+                    req.rid,
                     engine.getValues().mapIndexed { index, value -> NodeState(value, engine.getNeighborhood(index))}.toList()
                 ))
 

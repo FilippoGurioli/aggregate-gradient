@@ -11,7 +11,7 @@ data class CreateSimulation(val nodeCount: Int, val maxDistance: Double)
 data class SetSource(val nodeId: Int)
 
 @Serializable
-data class Step(val stepCount: Int = 1)
+data class Step(val rid: Int, val stepCount: Int = 1)
 
 @Serializable
 data class NewPosition(val nodeId: Int, val x: Double, val y: Double, val z: Double)
@@ -19,7 +19,7 @@ data class NewPosition(val nodeId: Int, val x: Double, val y: Double, val z: Dou
 /*--------------- OUTPUT TYPES -------------------*/
 
 @Serializable
-data class State(val values: List<NodeState>)
+data class State(val rid: Int, val values: List<NodeState>)
 
 @Serializable
 data class NodeState(val value: Double, val neighbors: Set<Int>)
