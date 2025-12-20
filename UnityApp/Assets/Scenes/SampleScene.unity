@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &135303636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,7 +152,7 @@ MonoBehaviour:
   nodeCount: 10
   maxDistance: 3
   sources: 00000000
-  timeScale: 0.1
+  timeScale: 1
   rounds: 1000
   nodePrefab: {fileID: 481884058362055207, guid: 8222f78618b9ac314ab51a649986c1a6, type: 3}
   distance: 3
@@ -202,7 +202,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &271163487
 MonoBehaviour:
   m_ObjectHideFlags: 0
